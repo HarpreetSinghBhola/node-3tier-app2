@@ -133,7 +133,7 @@ pipeline {
 
     post {
         always {
-                 { 
+                node('') { 
                 echo "Cleaning Up"
                 sh '''
                 docker image prune -af && docker stop \$(docker ps -a -q)
