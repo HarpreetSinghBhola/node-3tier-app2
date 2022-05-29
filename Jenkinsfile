@@ -131,7 +131,7 @@ pipeline {
 
     post {
         always {
-            node('') { 
+            agent any { 
                 echo "Cleaning Up"
                 sh '''
                 docker image prune -af && docker stop \$(docker ps -a -q)
