@@ -10,7 +10,7 @@ services:
     depends_on:
       - drash
     ports:
-      - "8080:80"
+      - "8085:80"
     networks:
       - drash-app-network
 
