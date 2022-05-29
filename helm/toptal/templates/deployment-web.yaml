@@ -1,0 +1,66 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: air-tek
+spec:
+  selector:
+    matchLabels:
+      app: infraweb
+      tier: frontend
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: infraweb
+        tier: frontend
+    spec:
+      containers:
+        - name: infraweb
+          image: {{ .Values.infraweb.image }}
+          ports:
+            - name: tcp
+              containerPort: 5000
+          env: 
+          - name: ApiAddress
+            value: http://infraapi:5000/WeatherForecast
+          resources:
+            requests: #Requests describes the minimum amount of compute resources required
+              memory: "100Mi"
+              cpu: "100m"
+            limits: #Limits describes the maximum amount of compute resources allowed
+              memory: "150Mi"
+              cpu: "200m"
+              
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: infraweb
+  namespace: air-tek
+spec:
+  selector:
+    app: infraweb
+    tier: frontend
+  ports:
+    - port: 80
+      nodePort: 30001
+      protocol: TCP
+      targetPort: 5000
+  type: LoadBalancer
+
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: frontend-hpa
+  namespace: air-tek
+spec:
+  maxReplicas: 5
+  minReplicas: 2
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: frontend
+  targetCPUUtilizationPercentage: 80
