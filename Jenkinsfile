@@ -45,7 +45,9 @@ pipeline {
                     try{
                         echo " Running Test Docker image"
                         sh '''
-                        docker stop \$(docker ps -a -q)
+                        if [-z \$(docker ps -a -q)]; then
+				docker stop \$(docker ps -a -q)
+			fi
                         cd $WORKSPACE/app
                         docker-compose up -d'''
                     } catch (ex) {
@@ -131,7 +133,7 @@ pipeline {
 
     post {
         always {
-            agent any { 
+                 { 
                 echo "Cleaning Up"
                 sh '''
                 docker image prune -af && docker stop \$(docker ps -a -q)
